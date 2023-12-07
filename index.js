@@ -60,6 +60,10 @@ app.get("/info", (req, res) => {
     );
 });
 
+app.get("/", (req, res) => {
+    res.send("Welcome to the phonebook application!");
+});
+
 app.get("/api/persons", (req, res) => {
     res.json(persons);
 });
