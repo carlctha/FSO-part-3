@@ -1,13 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
-const cors = require("cors")
+const cors = require("cors");
 const app = express();
 
-app.use(cors())
+app.use(cors());
 
 app.use(express.json());
 
-const randomInt = () => Math.floor(Math.random() * 1000000);
+app.use(express.static("dist"));
 
 morgan.token("post-data", req => {
     if (req.method === "POST") {
@@ -25,6 +25,8 @@ app.use(
 app.use(morgan('tiny', {
     skip: (req) => req.method === 'POST',
 }));
+
+const randomInt = () => Math.floor(Math.random() * 1000000);
 
 let persons = [
     { 
