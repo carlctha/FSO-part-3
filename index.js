@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 
 const app = express();
 app.use(cors());
@@ -59,10 +60,9 @@ app.get("/info", (req, res) => {
     });
 });
 
-app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    console.log(id)
-    Person.findById(id).then(p => {
+/* app.get("/api/persons/:id", (req, res) => {
+    const id = Number(req.params._id);
+    Person.findById(ObjectId(id)).then(p => {
         if (p) {
             res.json(p);
         }
@@ -107,7 +107,7 @@ app.post("/api/persons", (req, res) => {
         res.json(person);
     });
 });
-
+ */
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Connected to port ${PORT}`);
