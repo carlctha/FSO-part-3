@@ -1,10 +1,9 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
-
 const app = express();
+const Person = require("./models/person");
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static("dist"));
@@ -26,22 +25,6 @@ app.use(morgan('tiny', {
     skip: (req) => req.method === 'POST',
 }));
 
-const randomInt = () => Math.floor(Math.random() * 1000000);
-
-const password = process.argv[2];
-
-const url = `mongodb+srv://fullstack:${password}@cluster0.nekwkid.mongodb.net/personsApp?retryWrites=true&w=majority`;
-
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
-});
-
-const Person = mongoose.model("Person", personSchema);
-
 app.get("/api/persons", (req, res) => {
     Person.find({}).then(result => {
         res.json(result);
@@ -61,9 +44,9 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-   Person.findById(req.params.id).then(p => {
-    res.json(p);
-   }); 
+    Person.findById(req.params.id).then(p => {
+        res.json(p);
+    }); 
 });
 
 app.delete("/api/persons/:id", (req, res) => {
