@@ -60,21 +60,14 @@ app.get("/info", (req, res) => {
     });
 });
 
-/* app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params._id);
-    Person.findById(ObjectId(id)).then(p => {
-        if (p) {
-            res.json(p);
-        }
-        else {
-            res.status(404).end();
-        };
-    });
+app.get("/api/persons/:id", (req, res) => {
+   Person.findById(req.params.id).then(p => {
+    res.json(p);
+   }); 
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    Person.findByIdAndDelete(id).then(p => {
+    Person.findByIdAndDelete(req.params.id).then(p => {
         res.status(204).end();
     });
 });
@@ -107,7 +100,7 @@ app.post("/api/persons", (req, res) => {
         res.json(person);
     });
 });
- */
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
     console.log(`Connected to port ${PORT}`);
