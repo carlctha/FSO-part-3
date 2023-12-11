@@ -13,7 +13,6 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model("Person", personSchema);
 
 mongoose.set("strictQuery", false);
-
 mongoose.connect(url);
 
 if (password !== process.env.PASSWORD) {

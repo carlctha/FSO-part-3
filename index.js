@@ -1,12 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
+
 const app = express();
-
 app.use(cors());
-
 app.use(express.json());
-
 app.use(express.static("dist"));
 
 morgan.token("post-data", req => {
@@ -28,59 +27,56 @@ app.use(morgan('tiny', {
 
 const randomInt = () => Math.floor(Math.random() * 1000000);
 
-let persons = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-];
+const password = process.argv[2];
+
+const url = `mongodb+srv://fullstack:${password}@cluster0.nekwkid.mongodb.net/personsApp?retryWrites=true&w=majority`;
+
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+const personSchema = new mongoose.Schema({
+    name: String,
+    number: String
+});
+
+const Person = mongoose.model("Person", personSchema);
+
+app.get("/api/persons", (req, res) => {
+    Person.find({}).then(result => {
+        res.json(result);
+    });
+});
 
 app.get("/info", (req, res) => {
     currDate = new Date();
-
-    res.send(
-        `
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${currDate}</p>
-        `
-    );
+    Person.find({}).then(result => {
+        res.send(
+            `
+            <p>Phonebook has info for ${result.length} people</p>
+            <p>${currDate}</p>
+            `
+        );
+    });
 });
 
 app.get("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
-    const person = persons.find(p => p.id === id);
-
-    if (person) {
-        res.json(person);
-    }
-    else {
-        res.status(404).end()
-    };
+    console.log(id)
+    Person.findById(id).then(p => {
+        if (p) {
+            res.json(p);
+        }
+        else {
+            res.status(404).end();
+        };
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
-    persons = persons.filter(p => p.id !== id);
-
-    console.log(persons);
-
-    res.status(204).end();
+    Person.findByIdAndDelete(id).then(p => {
+        res.status(204).end();
+    });
 });
 
 app.post("/api/persons", (req, res) => {
@@ -102,16 +98,15 @@ app.post("/api/persons", (req, res) => {
         });
     };
 
-    const person = {
-        id: randomInt(),
+    const person = new Person({
         name: body.name,
         number: body.number
-    }
+    });
 
-    persons = persons.concat(person)
-
-    res.json(person)
-})
+    person.save().then(p => {
+        res.json(person);
+    });
+});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
