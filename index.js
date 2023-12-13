@@ -26,6 +26,7 @@ app.use(morgan('tiny', {
 }));
 
 const errorHandler = (error, req, res, next) => {
+    const body = req.body;
     console.error(error.message);
 
     if (error.name === "CastError") {
@@ -33,6 +34,28 @@ const errorHandler = (error, req, res, next) => {
     };
 
     return next(error);
+};
+
+const validateData = (error, req, res, next) => {
+    const body = req.body;
+
+    if (!body.name && !body.number) {
+        return res.status(400).json({
+            error: "You need name and number"
+        });
+    }
+    else if (!body.name) {
+        return res.status(400).json({
+            error: "You need to add name"
+        });
+    }
+    else if (!body.number) {
+        return res.status(400).json({
+            error: "You need to add number"
+        });
+    };
+
+    next();
 };
 
 app.get("/api/persons", (req, res) => {
@@ -75,24 +98,8 @@ app.delete("/api/persons/:id", (req, res, next) => {
     });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", validateData, (req, res) => {
     const body = req.body;
-
-    if (!body.name && !body.number) {
-        return res.status(400).json({
-            error: "You need name and number"
-        });
-    }
-    else if (!body.name) {
-        return res.status(400).json({
-            error: "You need to add name"
-        });
-    }
-    else if (!body.number) {
-        return res.status(400).json({
-            error: "You need to add number"
-        });
-    };
 
     const person = new Person({
         name: body.name,
