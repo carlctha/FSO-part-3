@@ -26,7 +26,6 @@ app.use(morgan('tiny', {
 }));
 
 const errorHandler = (error, req, res, next) => {
-    const body = req.body;
     console.error(error.message);
 
     if (error.name === "CastError") {
@@ -36,20 +35,21 @@ const errorHandler = (error, req, res, next) => {
     return next(error);
 };
 
-const validateData = (error, req, res, next) => {
+const validateData = (req, res, next) => {
     const body = req.body;
+    console.log(typeof body.name, typeof body.number)
 
-    if (!body.name && !body.number) {
+    if (body.name === "" && body.number === "") {
         return res.status(400).json({
             error: "You need name and number"
         });
     }
-    else if (!body.name) {
+    else if (body.name === "") {
         return res.status(400).json({
             error: "You need to add name"
         });
     }
-    else if (!body.number) {
+    else if (body.number === "") {
         return res.status(400).json({
             error: "You need to add number"
         });
